@@ -81,10 +81,26 @@ def threaded (conn):
          flag1="file_loaded"
       conn.send(file_data1)
       conn.close()
-    if not ("HTTP/" in data):
-      if not ("WebKitFormBoundary" in data):
+    if (data.startswith("POST")):
+       WBOUNDARY=0
+       if ("WebKitFormBoundary" in data):
+          WBOUNDARY=1
+    if not ((data.startswith("POST")) or (data.startswith("GET"))):
+      if (WBOUNDARY==0):
         conn.close()
-        print "closed connection"
+        WBOUNDARY=5
+        print "closed connection WBOUNDARY 0"
+      if (WBOUNDARY==3):
+        WBOUNDARY=5
+        conn.close()
+        print "closed connection WBOUNDARY 3"
+      if (WBOUNDARY==2):
+        if ("WebKitFormBoundary" in data):
+           WBOUNDARY=3
+      if (WBOUNDARY==1):
+        if ("WebKitFormBoundary" in data):
+           WBOUNDARY=2
+
    
 ###############################
 def GETFILENAME(filename):
