@@ -1,0 +1,290 @@
+<html>
+  <title> </title>
+  <body BGCOLOR="#FFEBCD">
+<h1> Title </h1>
+   <br>
+     <button id="Clear" name"Clear">Clear</button>
+   <br>
+   <label for "VarName">IP address (ex. 10.23.23.0/29)</label>
+   <input type="text" id="VarName" name="VarName"></input>
+   <label for "VarName1">Operator (getPos, getNetwork, getMask)</label>
+   <input type="text" id="VarName1" name="VarName1" value="getPos"></input>
+  <br>
+<script type="application/json" id="stuff">
+ {
+   "events": [
+    {
+        "unicorns": "awesome",
+        "abc": [1, 2, 3]
+    },
+    {
+        "unicorns": "awesome2",
+        "abc": [4, 5, 6]
+    }
+
+   ]
+ }
+</script>
+  <br>
+   <lable for="CheckBox_VarName3">Description3</label>
+   <input type="checkbox" id="CheckBox_VarName3">
+  <br>
+  <br>
+<form method="post" enctype="multipart/form-data">
+  <label for="file">File</label>
+  <input id="file" name="file" type="file" />
+  <button>Upload</button>
+</form>
+<br>
+   <label for "VarName4">Position</label>
+   <input type="text" id="VarName4" name="VarName4" value="1"></input>
+  <br>
+  <br>
+   <button id="run" name="run">RUN</button>
+   <br>
+   <br>
+   <textarea id="CONFIGOUT" row="100" cols="100"></textarea>
+   <pre id="text"></pre>
+   <script type="text/javascript">
+       let run_btn= document.getElementById("run");
+       run_btn.addEventListener("click", event => {
+          run_script2();
+       });
+   let clear_btn=document.getElementById("Clear");
+   clear_btn.addEventListener("click", event => {
+       document.getElementById("VarName").value="";
+       document.getElementById("VarName1").value="";
+      document.getElementById("CheckBox_VarName3").checked=true;
+       document.getElementById("VarName4").value="";
+   CONFIGOUT.value="";
+    });
+   function run_script() {
+       var VarName = document.getElementById("VarName").value;
+       var VarName1 = document.getElementById("VarName1").value;
+       var CheckBox_VarName3 = document.getElementById("CheckBox_VarName3");
+       CheckBox_VarName3 = CheckBox_VarName3.checked;
+       var VarName4 = document.getElementById("VarName4").value;
+       var stuff = JSON.parse(document.getElementById("stuff").innerHTML);
+      CALLFUNCTION1(VarName, VarName1, CheckBox_VarName3, VarName4, stuff);
+    }
+   function run_script2() {
+       var VarName = document.getElementById("VarName").value;
+       var VarName1 = document.getElementById("VarName1").value;
+       var CheckBox_VarName3 = document.getElementById("CheckBox_VarName3");
+       CheckBox_VarName3 = CheckBox_VarName3.checked;
+       var VarName4 = document.getElementById("VarName4").value;
+       var stuff = JSON.parse(document.getElementById("stuff").innerHTML);
+      CONFIGOUT.value=CALLFUNCTION2(VarName, VarName1, VarName4);
+    }
+   function CALLFUNCTION1(VarName, VarName1, CheckBox_VarName3, VarName4, stuff) {
+     var JAVAOUTPUT="dummy output";
+     CONFIGOUT.value=JAVAOUTPUT+" "+stuff.events[1].unicorns;
+     document.getElementById("text").innerHTML = JAVAOUTPUT+" "+stuff.events[1].abc[1];
+    }
+   function CALLFUNCTION2(IP_SUBNET, OPRT, POSITION) {
+     let JAVAOUTPUT="dummy output";
+     if (OPRT=="getPos") {
+       return getPos(IP_SUBNET, POSITION);
+      }
+     if (OPRT=="getNetwork") {
+       return getNetwork(IP_SUBNET);
+      }
+     if (OPRT=="getMask") {
+       let a=IP_SUBNET.split("/");
+       let b="/"+a[1];
+       return CHANGEMASK(b);
+      }
+
+function run_script6() {
+       var a = document.getElementById("IP_ADDRESS").value;
+       var b = document.getElementById("subnet").value;
+       var b=b.replace("sn", "/");
+       a=a+b;
+       var c=getNetwork(a);
+       var d=getInvmask(b);
+       var e=BROADCAST(a,b);
+       var f=CHANGEMASK(b);
+       c="Network address is <FONT SIZE=+2>"+c+"</FONT><br>";
+       c+="Broadcast mask is <FONT SIZE=+2>"+e+"</FONT><br>";
+       c+="Subnet mask is <FONT SIZE=+2>"+f+"</FONT><br>";
+       c+="wildcast mask is <FONT SIZE=+2>"+d+"</FONT><br>";
+       document.getElementById("text").innerHTML = c;
+    }
+  function ADDMASK(MASK, b1) {
+       var a=parseInt(MASK);
+       var b=parseInt(b1);
+       var c=a+b;
+       var MAND=c.toString();
+       return MAND;
+  }  
+  function MSKAND(MASK, b1) {
+       var a=parseInt(MASK);
+       var b=parseInt(b1);
+       var c=a&b;
+       var MAND=c.toString();
+       return MAND;
+    }
+  function BROADCAST(IPINPUT,SHORTMASK) {
+       var NETWORK=getNetwork(IPINPUT);
+       var WILDCAST=getInvmask(SHORTMASK);
+
+       var IPINPUT2=NETWORK.split(".");
+       var MASK1=WILDCAST.split(".");
+       var NETWORK1="";
+       var SUBMASK="";
+       for (var i=0; i<3; i++) {
+           SUBMASK=ADDMASK(IPINPUT2[i],MASK1[i]);
+           NETWORK1+=SUBMASK+"."; 
+        }
+       SUBMASK=ADDMASK(IPINPUT2[3],MASK1[3]);
+       NETWORK1+= SUBMASK; 
+       return NETWORK1;
+  } 
+  function getNetwork(IPINPUT) {
+       var IPINPUT1=IPINPUT.split("/");
+       var IPINPUT2=IPINPUT1[0].split(".");
+       var MASKSHORT="/"+IPINPUT1[1];
+       var MASK2=CHANGEMASK(MASKSHORT);
+       var MASK1=MASK2.split(".");
+       var NETWORK="";
+       var SUBMASK="";
+       for (var i=0; i<3; i++) {
+           SUBMASK=MSKAND(IPINPUT2[i],MASK1[i]);
+           NETWORK+=SUBMASK+"."; 
+        }
+       SUBMASK=MSKAND(IPINPUT2[3],MASK1[3]);
+       NETWORK+= SUBMASK; 
+       return NETWORK;
+     }
+  function getInvmask(MASKSHORT) {
+       var MASKDOT=CHANGEMASK(MASKSHORT);
+       var MASKARR=MASKDOT.split(".");
+       var a1=255-parseInt(MASKARR[0]);
+       var a2=255-parseInt(MASKARR[1]);
+       var a3=255-parseInt(MASKARR[2]);
+       var a4=255-parseInt(MASKARR[3]);
+       var b1=a1.toString();
+       var b2=a2.toString();
+       var b3=a3.toString();
+       var b4=a4.toString();
+       var INVMASK=b1+"."+b2+"."+b3+"."+b4;
+       return INVMASK;
+     }
+  function getPos(INPUT, POS) {
+     //########### 
+     //The position is counting from one. The computation is valid for last octet only.
+     //##########
+       var IPPOS="A";
+       var IPNET=getNetwork(INPUT);
+       var NETARR=IPNET.split(".");
+       var a=parseInt(NETARR[3]);
+       var b=parseInt(POS);
+       var c=a+b-1;
+       var d=c.toString();
+       IPPOS=NETARR[0]+"."+NETARR[1]+"."+NETARR[2]+"."+d; 
+       return  IPPOS;
+     }
+  function CHANGEMASK(MASKSHORT) {
+       var MASKLONG1="ERROR.ERROR.ERROR.ERROR";
+       if (MASKSHORT=="/31") {
+           MASKLONG1="255.255.255.254";
+        }
+       if (MASKSHORT=="/30") {
+           MASKLONG1="255.255.255.252";
+        }
+       if (MASKSHORT=="/29") {
+           MASKLONG1="255.255.255.248";
+        }
+       if (MASKSHORT=="/28") {
+           MASKLONG1="255.255.255.240";
+        }
+       if (MASKSHORT=="/27") {
+           MASKLONG1="255.255.255.224";
+        }
+       if (MASKSHORT=="/26") {
+           MASKLONG1="255.255.255.192";
+        }
+       if (MASKSHORT=="/25") {
+           MASKLONG1="255.255.255.128";
+        }
+       if (MASKSHORT=="/24") {
+           MASKLONG1="255.255.255.0";
+        }
+       if (MASKSHORT=="/23") {
+           MASKLONG1="255.255.254.0";
+        }
+       if (MASKSHORT=="/22") {
+           MASKLONG1="255.255.252.0";
+        }
+       if (MASKSHORT=="/21") {
+           MASKLONG1="255.255.248.0";
+        }
+       if (MASKSHORT=="/20") {
+           MASKLONG1="255.255.240.0";
+        }
+       if (MASKSHORT=="/19") {
+           MASKLONG1="255.255.224.0";
+        }
+       if (MASKSHORT=="/18") {
+           MASKLONG1="255.255.192.0";
+        }
+       if (MASKSHORT=="/17") {
+           MASKLONG1="255.255.128.0";
+        }
+       if (MASKSHORT=="/16") {
+           MASKLONG1="255.255.0.0";
+        }
+       if (MASKSHORT=="/15") {
+           MASKLONG1="255.254.0.0";
+        }
+       if (MASKSHORT=="/14") {
+           MASKLONG1="255.252.0.0";
+        }
+       if (MASKSHORT=="/13") {
+           MASKLONG1="255.248.0.0";
+        }
+       if (MASKSHORT=="/12") {
+           MASKLONG1="255.240.0.0";
+        }
+       if (MASKSHORT=="/11") {
+           MASKLONG1="255.224.0.0";
+        }
+       if (MASKSHORT=="/10") {
+           MASKLONG1="255.192.0.0";
+        }
+       if (MASKSHORT=="/9") {
+           MASKLONG1="255.128.0.0";
+        }
+       if (MASKSHORT=="/8") {
+           MASKLONG1="255.0.0.0";
+        }
+       if (MASKSHORT=="/7") {
+           MASKLONG1="254.0.0.0";
+        }
+       if (MASKSHORT=="/6") {
+           MASKLONG1="252.0.0.0";
+        }
+       if (MASKSHORT=="/5") {
+           MASKLONG1="248.0.0.0";
+        }
+       if (MASKSHORT=="/4") {
+           MASKLONG1="240.0.0.0";
+        }
+       if (MASKSHORT=="/3") {
+           MASKLONG1="224.0.0.0";
+        }
+       if (MASKSHORT=="/2") {
+           MASKLONG1="192.0.0.0";
+        }
+       if (MASKSHORT=="/1") {
+           MASKLONG1="128.0.0.0";
+        }
+       if (MASKSHORT=="/0") {
+           MASKLONG1="0.0.0.0";
+        }
+       return MASKLONG1;
+     }
+    }
+   </script>
+</body>
+</html>
