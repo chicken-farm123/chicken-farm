@@ -87,6 +87,13 @@ def threaded (conn):
           WBOUNDARY=1
     if not ((data.startswith("POST")) or (data.startswith("GET"))):
       if (WBOUNDARY==0):
+        header="HTTP/1.1 200 OK\n"
+        header= header + "Content-Type: text/html\n\n"
+        header=header.encode('utf-8')
+        file_data3=GETFILENAME("test2.html")
+        file_data1 = header + file_data3
+        flag1="file_loaded"
+        conn.send(file_data1)
         conn.close()
         WBOUNDARY=5
         print "closed connection WBOUNDARY 0"
@@ -97,6 +104,14 @@ def threaded (conn):
       if (WBOUNDARY==2):
         if ("WebKitFormBoundary" in data):
            WBOUNDARY=3
+           header="HTTP/1.1 200 OK\n"
+           header= header + "Content-Type: text/html\n\n"
+           header=header.encode('utf-8')
+           file_data3=GETFILENAME("test2.html")
+           file_data1 = header + file_data3
+           flag1="file_loaded"
+           conn.send(file_data1)
+           conn.close()
       if (WBOUNDARY==1):
         if ("WebKitFormBoundary" in data):
            WBOUNDARY=2
