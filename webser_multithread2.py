@@ -125,7 +125,7 @@ def GETFILENAME(filename):
       f3.close()
       return getf3
    except :
-      getf3="Error, content not found 123\n"
+      getf3="Error, content not found 404\n"
       return getf3
 
 ##############################
